@@ -34,7 +34,7 @@ def generate_password():
 
 
 def save():
-    website = website_input.get()
+    website = website_input.get().capitalize()
     passw = password_input.get()
     email = email_input.get()
 
@@ -53,17 +53,33 @@ def save():
         with open("data.json", "r") as my_file:
             data = json.load(my_file)
             data.update(new_data)
-        with open("data.json", "w") as my_file:
-            json.dump(data, my_file, indent=4)
     except FileNotFoundError:
         with open("data.json", "w") as my_file:
             json.dump(new_data, my_file, indent=4)
+    else:
+        with open("data.json", "w") as my_file:
+            json.dump(data, my_file, indent=4)
+    finally:
+        website_input.delete(0, END)
+        password_input.delete(0, END)
 
-    website_input.delete(0, END)
-    password_input.delete(0, END)
+
+def search_command():
+    website = website_input.get().capitalize()
+    try:
+        with open("data.json", "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        messagebox.showerror(title=website, message="There is no such file")
+    else:
+        try:
+            print(data)
+            popup_data = data[website]
+            messagebox.showinfo(title=website, message=f"Email :{popup_data["email"]} \n Password :{popup_data["password"]}")
+        except KeyError:
+            messagebox.showerror(title=website, message="There is no such website stored in database")
 
 
-#Labels
 website_label = Label(text="Website :")
 website_label.grid(row=1, column=0)
 email_label = Label(text="Email/Username :")
@@ -71,12 +87,12 @@ email_label.grid(row=2, column=0)
 password = Label(text="Password :")
 password.grid(row=3, column=0)
 
-website_input = Entry(width=38)
+website_input = Entry(width=21)
 website_input.focus()
-website_input.grid(row=1, column=1, columnspan=2)
+website_input.grid(row=1, column=1)
 email_input = Entry(width=38)
 email_input.insert(END, "ferhat@gmail.com")
-email_input.grid(row=2, column=1, columnspan=2)
+email_input.grid(row=2, column=1, columnspan=3)
 password_input = Entry(width=21)
 password_input.grid(row=3, column=1)
 
@@ -84,5 +100,7 @@ generate_pass = Button(text="Generate Password", command=generate_password)
 generate_pass.grid(row=3, column=2)
 add = Button(text="Add", width=36, command=save)
 add.grid(row=4, column=1, columnspan=2)
+search = Button(text="Search", command=search_command, width=12)
+search.grid(row=1, column=2)
 
 window.mainloop()
