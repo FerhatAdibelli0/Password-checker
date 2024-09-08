@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
 import pyperclip
+import json
 
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
            'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
@@ -36,14 +37,30 @@ def save():
     website = website_input.get()
     passw = password_input.get()
     email = email_input.get()
+
+    new_data = {
+        website: {
+            "email": email,
+            "password": passw
+        }
+    }
+
     if passw == "" or website == "":
         return messagebox.showerror(message="Empty input. Please check your all inputs")
-    is_ok = messagebox.askokcancel(title="Confirmation", message="Do you really agree with your written input data ?")
-    if is_ok:
-        with open("data.txt", "a") as my_file:
-            my_file.write(f"{website} | {passw} | {email} \n")
-        website_input.delete(0, END)
-        password_input.delete(0, END)
+    # is_ok = messagebox.askokcancel(title="Confirmation", message="Do you really agree with your written input data ?")
+    # if is_ok:
+    try:
+        with open("data.json", "r") as my_file:
+            data = json.load(my_file)
+            data.update(new_data)
+        with open("data.json", "w") as my_file:
+            json.dump(data, my_file, indent=4)
+    except FileNotFoundError:
+        with open("data.json", "w") as my_file:
+            json.dump(new_data, my_file, indent=4)
+
+    website_input.delete(0, END)
+    password_input.delete(0, END)
 
 
 #Labels
